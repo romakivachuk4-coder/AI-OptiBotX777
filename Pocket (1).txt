@@ -29,6 +29,24 @@
             --glass-bg: rgba(255, 255, 255, 0.7);
             --glass-border: rgba(0, 0, 0, 0.1);
         }
+        .get-code-link {
+    display: inline-block;
+    margin-top: 15px;
+    color: var(--accent); /* Использует ваш фиолетовый цвет */
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    padding: 8px 15px;
+    border-radius: 8px;
+}
+
+.get-code-link:hover {
+    color: white;
+    text-shadow: 0 0 10px var(--accent-glow);
+    background: rgba(91, 77, 255, 0.1); /* Легкая подсветка при наведении */
+    transform: translateY(-2px);
+} 
         body {
             margin: 0; padding: 0; background: var(--bg-color); color: var(--text-color);
             font-family: 'Segoe UI', sans-serif; height: 100vh; 
@@ -727,9 +745,13 @@
 <div id="register-overlay" class="register-overlay">
     <div class="register-glass">
         <h3 id="register-title">🔐 Access</h3>
-        <p id="register-text">To register, contact <a id="dynamic-contact" class="contact" href="https://t.me/ZentixTrade" target="_blank">@ZentixTrade</a> and get an activation code.</p>
+        <p id="register-text">Enter your activation code to continue</p>
+        
         <input type="text" id="code-input" class="register-input" placeholder="Enter code">
         <button id="activate-btn" class="register-btn">Activate</button>
+        
+        <a href="https://t.me/ZentixTrade" target="_blank" id="get-code-btn" class="get-code-link">напиши сюда "КОД"</a>
+        
         <div id="register-message" class="register-message"></div>
     </div>
 </div>
@@ -810,8 +832,7 @@
     const adminUsername = '@ZentixTrade';
     document.getElementById('watermark').innerText = 'OptiBotX PRO';
 
-    // ==================== СИСТЕМА ОДНОРАЗОВЫХ КОДОВ ====================
-    // Список валидных кодов (50 штук, минимум 7 цифр)
+// ==================== СИСТЕМА ОДНОРАЗОВЫХ КОДОВ ====================
     const validCodes = [
         '10341638', '20451927', '30561836', '40771345', '50881454',
         '60991563', '70101672', '80211781', '90321890', '10431909',
@@ -825,20 +846,126 @@
         '46095563', '47105672', '48215781', '49325890', '50435909'
     ];
 
-    // Загружаем использованные коды из localStorage или создаём пустой объект
     let usedCodes = JSON.parse(localStorage.getItem('usedCodes')) || {};
 
-    // Функция для проверки кода
     function isCodeValid(code) {
         return validCodes.includes(code) && !usedCodes[code];
     }
 
-    // Функция для пометки кода как использованного
     function markCodeAsUsed(code) {
         usedCodes[code] = true;
         localStorage.setItem('usedCodes', JSON.stringify(usedCodes));
     }
 
+    const dict = {
+        en: { 
+            sub: "Select currency pair", an: "Analyze", wait: "Waiting...", up: "BUY ", down: "SELL ",
+            welcome: "Welcome", chooseLang: "Choose your language", flag: "🇬🇧",
+            registerTitle: "🔐 Access", registerText: "Enter activation code to continue",
+            getCode: 'write "CODE" here', // Текст для кнопки
+            codePlaceholder: "Enter code", submit: "Activate",
+            wrongCode: "❌ Invalid or used code", success: "✅ Access granted!"
+        },
+        ru: { 
+            sub: "Выбери валютную пару", an: "Анализировать", wait: "Ожидание...", up: "ВВЕРХ ", down: "ВНИЗ ",
+            welcome: "Добро пожаловать", chooseLang: "Выберите язык", flag: "🇷🇺",
+            registerTitle: "🔐 Доступ", registerText: "Для продолжения введите код активации",
+            getCode: 'напиши сюда "КОД"', // Текст для кнопки
+            codePlaceholder: "Введите код", submit: "Активировать",
+            wrongCode: "❌ Неверный или использованный код", success: "✅ Доступ открыт!"
+        },
+        es: { 
+            sub: "Seleccione par", an: "Analizar", wait: "Esperando...", up: "COMPRAR ", down: "VENDER ",
+            welcome: "Bienvenido", chooseLang: "Elija su idioma", flag: "🇪🇸",
+            registerTitle: "🔐 Acceso", registerText: "Ingrese el código de activación",
+            getCode: 'escribe "CÓDIGO" aquí',
+            codePlaceholder: "Código", submit: "Activar",
+            wrongCode: "❌ Código inválido", success: "✅ Acceso concedido!"
+        },
+        pl: {
+            sub: "Wybierz parę", an: "Analizuj", wait: "Oczekiwanie...", up: "W GÓRĘ ", down: "W DÓŁ ",
+            welcome: "Witaj", chooseLang: "Wybierz język", flag: "🇵🇱",
+            registerTitle: "🔐 Dostęp", registerText: "Wprowadź kod aktywacyjny",
+            getCode: 'napisz tutaj "KOD"',
+            codePlaceholder: "Kod", submit: "Aktywuj",
+            wrongCode: "❌ Błędny kod", success: "✅ Dostęp przyznany!"
+        },
+        de: {
+            sub: "Währungspaar", an: "Analysieren", wait: "Warten...", up: "KAUFEN ", down: "VERKAUFEN ",
+            welcome: "Willkommen", chooseLang: "Sprache wählen", flag: "🇩🇪",
+            registerTitle: "🔐 Zugang", registerText: "Aktivierungscode eingeben",
+            getCode: 'hier "CODE" schreiben',
+            codePlaceholder: "Code", submit: "Aktivieren",
+            wrongCode: "❌ Ungültiger Code", success: "✅ Zugang gewährt!"
+        },
+        fr: {
+            sub: "Paire de devises", an: "Analyser", wait: "Attente...", up: "ACHAT ", down: "VENTE ",
+            welcome: "Bienvenue", chooseLang: "Langue", flag: "🇫🇷",
+            registerTitle: "🔐 Accès", registerText: "Entrez le code d'activation",
+            getCode: 'écrivez "CODE" ici',
+            codePlaceholder: "Code", submit: "Activer",
+            wrongCode: "❌ Code invalide", success: "✅ Accès accordé!"
+        }
+    };
+
+    // --- ЭЛЕМЕНТЫ ---
+    const registerOverlay = document.getElementById('register-overlay');
+    const registerTitle = document.getElementById('register-title');
+    const registerText = document.getElementById('register-text');
+    const codeInput = document.getElementById('code-input');
+    const activateBtn = document.getElementById('activate-btn');
+    const registerMessage = document.getElementById('register-message');
+    const getCodeBtn = document.getElementById('get-code-btn'); // Кнопка "Напиши КОД"
+
+    // --- ОБНОВЛЕНИЕ ЯЗЫКА ---
+    function updateUILang() {
+        if (subHeader) subHeader.innerText = dict[curLang].sub;
+        const btnSpan = anBtn.querySelector('.btn-text');
+        if (btnSpan) btnSpan.innerText = dict[curLang].an;
+        
+        waitMsg.innerText = dict[curLang].wait;
+        searchInput.placeholder = dict[curLang].sub;
+
+        // Обновление окна регистрации
+        registerTitle.innerText = dict[curLang].registerTitle;
+        registerText.innerText = dict[curLang].registerText;
+        codeInput.placeholder = dict[curLang].codePlaceholder;
+        activateBtn.innerText = dict[curLang].submit;
+        
+        // ВАЖНО: Обновляем текст кнопки получения кода
+        if (getCodeBtn) {
+            getCodeBtn.innerText = dict[curLang].getCode;
+        }
+    }
+
+    // --- АКТИВАЦИЯ ---
+    activateBtn.addEventListener('click', () => {
+        const code = codeInput.value.trim();
+        
+        if (isCodeValid(code)) {
+            markCodeAsUsed(code);
+            registered = true;
+            localStorage.setItem('optibotx_registered', 'true');
+            registerMessage.innerText = dict[curLang].success;
+            registerMessage.className = 'register-message success';
+            
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+            }
+
+            setTimeout(() => {
+                registerOverlay.classList.remove('visible');
+                registerMessage.innerText = '';
+            }, 1500);
+        } else {
+            registerMessage.innerText = dict[curLang].wrongCode;
+            registerMessage.className = 'register-message error';
+            
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+            }
+        }
+    });
     const dict = {
         en: { 
             sub: "Select currency pair", 
